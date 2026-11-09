@@ -314,3 +314,19 @@ class AsesoriaEspecializada(Servicio):
     def describir(self) -> str:
         # Devuelve la descripcion especializada.
         return f"Asesoria {self.nivel} a ${self.tarifa_hora:,.0f} por hora base"
+
+
+# Centraliza la validacion de impuestos y descuentos.
+def aplicar_ajustes(subtotal: float, impuesto: float = 0.0, descuento: float = 0.0) -> float:
+    # Valida que el subtotal no sea negativo.
+    if subtotal < 0:
+        # Evita calculos financieros inconsistentes.
+        raise DatoInvalidoError("El subtotal no puede ser negativo.")
+    # Valida porcentajes entre cero y cien.
+    if not 0 <= impuesto <= 100 or not 0 <= descuento <= 100:
+        # Rechaza porcentajes que producirian resultados incoherentes.
+        raise DatoInvalidoError("Impuesto y descuento deben estar entre 0 y 100.")
+    # Aplica primero el descuento y luego el impuesto.
+    total = subtotal * (1 - descuento / 100) * (1 + impuesto / 100)
+    # Devuelve el total redondeado a dos decimales.
+    return round(total, 2)
