@@ -14,3 +14,5 @@ from abc import ABC, abstractmethod
 from datetime import datetime
 # Importa logging para registrar eventos y errores en un archivo.
 import logging
+# Importa count para generar identificadores consecutivos de reserva.
+from itertools import count
