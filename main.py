@@ -12,3 +12,5 @@ No utiliza bases de datos. Los eventos y errores se guardan en software_fj.log.
 from abc import ABC, abstractmethod
 # Importa datetime para asignar fecha y hora a cada reserva.
 from datetime import datetime
+# Importa logging para registrar eventos y errores en un archivo.
+import logging
