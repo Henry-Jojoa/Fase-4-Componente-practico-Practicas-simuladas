@@ -7,3 +7,6 @@ El programa demuestra abstraccion, herencia, polimorfismo, encapsulacion,
 parametros opcionales para calcular costos y manejo avanzado de excepciones.
 No utiliza bases de datos. Los eventos y errores se guardan en software_fj.log.
 """
+
+# Importa ABC y abstractmethod para definir clases y metodos abstractos.
+from abc import ABC, abstractmethod
