@@ -153,3 +153,55 @@ class Cliente(Entidad):
     def describir(self) -> str:
         # Devuelve una descripcion segura del cliente.
         return f"Cliente {self.nombre} (ID: {self.identificador})"
+
+
+# Define la estructura comun de todos los servicios.
+class Servicio(Entidad, ABC):
+    """Clase abstracta para los servicios de Software FJ."""
+
+    # Inicializa los datos comunes de un servicio.
+    def __init__(self, identificador: str, nombre: str, disponible: bool = True) -> None:
+        # Inicializa el identificador heredado.
+        super().__init__(identificador)
+        # Valida el nombre del servicio.
+        if not isinstance(nombre, str) or not nombre.strip():
+            # Informa que el nombre es obligatorio.
+            raise DatoInvalidoError("El nombre del servicio es obligatorio.")
+        # Guarda el nombre publico normalizado.
+        self.nombre = nombre.strip()
+        # Guarda la disponibilidad como valor booleano privado.
+        self.__disponible = bool(disponible)
+
+    # Permite consultar si el servicio esta disponible.
+    @property
+    def disponible(self) -> bool:
+        # Devuelve la disponibilidad privada.
+        return self.__disponible
+
+    # Permite cambiar la disponibilidad de forma controlada.
+    def cambiar_disponibilidad(self, disponible: bool) -> None:
+        # Valida que se reciba especificamente un booleano.
+        if not isinstance(disponible, bool):
+            # Rechaza valores ambiguos.
+            raise DatoInvalidoError("La disponibilidad debe ser True o False.")
+        # Actualiza el estado privado.
+        self.__disponible = disponible
+        # Registra el cambio realizado.
+        LOGGER.info("Disponibilidad de %s cambiada a %s", self.identificador, disponible)
+
+    # Valida los parametros generales antes de reservar.
+    def validar_parametros(self, duracion: float) -> None:
+        # Impide reservar un servicio marcado como no disponible.
+        if not self.disponible:
+            # Lanza la excepcion especifica correspondiente.
+            raise ServicioNoDisponibleError(f"El servicio {self.nombre} no esta disponible.")
+        # Exige una duracion numerica mayor que cero.
+        if not isinstance(duracion, (int, float)) or isinstance(duracion, bool) or duracion <= 0:
+            # Informa que la duracion recibida no es valida.
+            raise DatoInvalidoError("La duracion debe ser un numero mayor que cero.")
+
+    # Declara el calculo polimorfico que implementara cada servicio.
+    @abstractmethod
+    def calcular_costo(self, duracion: float, impuesto: float = 0.0, descuento: float = 0.0) -> float:
+        # No calcula costos en la clase abstracta.
+        raise NotImplementedError
