@@ -76,3 +76,80 @@ class Entidad(ABC):
     def __str__(self) -> str:
         # Utiliza la descripcion polimorfica de la clase concreta.
         return self.describir()
+
+
+# Representa un cliente y encapsula sus datos personales.
+class Cliente(Entidad):
+    """Cliente con nombre, correo y telefono validados."""
+
+    # Construye un cliente con sus datos principales.
+    def __init__(self, identificador: str, nombre: str, correo: str, telefono: str) -> None:
+        # Inicializa la parte heredada de Entidad.
+        super().__init__(identificador)
+        # Inicializa atributos privados antes de usar sus propiedades.
+        self.__nombre = ""
+        self.__correo = ""
+        self.__telefono = ""
+        # Asigna el nombre mediante el setter validador.
+        self.nombre = nombre
+        # Asigna el correo mediante el setter validador.
+        self.correo = correo
+        # Asigna el telefono mediante el setter validador.
+        self.telefono = telefono
+        # Registra la creacion correcta del cliente.
+        LOGGER.info("Cliente creado: %s", self.identificador)
+
+    # Permite consultar el nombre encapsulado.
+    @property
+    def nombre(self) -> str:
+        # Devuelve el nombre privado.
+        return self.__nombre
+
+    # Permite modificar el nombre solo si es valido.
+    @nombre.setter
+    def nombre(self, valor: str) -> None:
+        # Comprueba que tenga al menos tres caracteres utiles.
+        if not isinstance(valor, str) or len(valor.strip()) < 3:
+            # Detiene la operacion con una excepcion personalizada.
+            raise DatoInvalidoError("El nombre debe tener al menos 3 caracteres.")
+        # Guarda el nombre normalizado.
+        self.__nombre = valor.strip().title()
+
+    # Permite consultar el correo encapsulado.
+    @property
+    def correo(self) -> str:
+        # Devuelve el correo privado.
+        return self.__correo
+
+    # Permite modificar el correo solo si tiene formato basico valido.
+    @correo.setter
+    def correo(self, valor: str) -> None:
+        # Comprueba elementos esenciales de una direccion de correo.
+        if not isinstance(valor, str) or "@" not in valor or "." not in valor.split("@")[-1]:
+            # Informa que el correo suministrado no es valido.
+            raise DatoInvalidoError("El correo no tiene un formato valido.")
+        # Guarda el correo en minusculas.
+        self.__correo = valor.strip().lower()
+
+    # Permite consultar el telefono encapsulado.
+    @property
+    def telefono(self) -> str:
+        # Devuelve el telefono privado.
+        return self.__telefono
+
+    # Permite modificar el telefono si contiene entre 7 y 15 digitos.
+    @telefono.setter
+    def telefono(self, valor: str) -> None:
+        # Convierte el dato a texto y retira espacios.
+        texto = str(valor).strip()
+        # Verifica que solo haya digitos y que la longitud sea adecuada.
+        if not texto.isdigit() or not 7 <= len(texto) <= 15:
+            # Informa el requisito incumplido.
+            raise DatoInvalidoError("El telefono debe contener entre 7 y 15 digitos.")
+        # Guarda el telefono validado.
+        self.__telefono = texto
+
+    # Implementa el metodo abstracto heredado.
+    def describir(self) -> str:
+        # Devuelve una descripcion segura del cliente.
+        return f"Cliente {self.nombre} (ID: {self.identificador})"
