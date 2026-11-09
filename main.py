@@ -45,3 +45,34 @@ class ServicioNoDisponibleError(ErrorSoftwareFJ):
 # Define una excepcion para cambios de estado no permitidos.
 class OperacionNoPermitidaError(ErrorSoftwareFJ):
     """Se lanza cuando una operacion no es valida para el estado actual."""
+
+
+# Declara una entidad abstracta con identificador y descripcion obligatoria.
+class Entidad(ABC):
+    """Clase abstracta general para las entidades principales."""
+
+    # Inicializa el identificador protegido de la entidad.
+    def __init__(self, identificador: str) -> None:
+        # Valida que el identificador sea texto no vacio.
+        if not isinstance(identificador, str) or not identificador.strip():
+            # Informa el motivo exacto del error.
+            raise DatoInvalidoError("El identificador debe ser un texto no vacio.")
+        # Guarda el identificador sin espacios externos.
+        self._identificador = identificador.strip()
+
+    # Expone el identificador sin permitir su modificacion directa.
+    @property
+    def identificador(self) -> str:
+        # Devuelve el identificador protegido.
+        return self._identificador
+
+    # Obliga a las clases derivadas a proporcionar una descripcion.
+    @abstractmethod
+    def describir(self) -> str:
+        # No implementa comportamiento en la clase abstracta.
+        raise NotImplementedError
+
+    # Define una representacion legible comun para todas las entidades.
+    def __str__(self) -> str:
+        # Utiliza la descripcion polimorfica de la clase concreta.
+        return self.describir()
