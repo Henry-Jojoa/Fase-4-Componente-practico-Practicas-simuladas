@@ -16,3 +16,10 @@ from datetime import datetime
 import logging
 # Importa count para generar identificadores consecutivos de reserva.
 from itertools import count
+# Configura el archivo de registro, el nivel y el formato de cada mensaje.
+logging.basicConfig(
+    filename="software_fj.log",
+    level=logging.INFO,
+    format="%(asctime)s | %(levelname)s | %(message)s",
+    encoding="utf-8",
+)
