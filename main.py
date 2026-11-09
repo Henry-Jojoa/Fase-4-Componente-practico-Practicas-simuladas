@@ -502,3 +502,89 @@ def ejecutar_operacion(numero: int, titulo: str, funcion) -> object | None:
     finally:
         # Muestra que el sistema continua disponible.
         print("Estado: operacion finalizada; el sistema continua activo.")
+
+
+# Ejecuta al menos diez operaciones validas e invalidas de forma secuencial.
+def demostracion() -> None:
+    # Muestra el titulo principal.
+    print("SISTEMA INTEGRAL DE GESTION - SOFTWARE FJ")
+    # Registra el inicio de la demostracion.
+    LOGGER.info("Inicio de la demostracion secuencial")
+    # Crea el administrador en memoria.
+    sistema = SistemaGestion()
+
+    # Crea correctamente el primer cliente.
+    cliente_1 = ejecutar_operacion(1, "Registrar cliente valido", lambda: Cliente("C001", "Ana Torres", "ana@correo.com", "3101234567"))
+    # Agrega el cliente si la operacion fue exitosa.
+    if cliente_1:
+        sistema.agregar_cliente(cliente_1)
+
+    # Intenta crear un cliente con correo invalido.
+    ejecutar_operacion(2, "Registrar cliente con correo invalido", lambda: Cliente("C002", "Luis Perez", "correo-invalido", "3111234567"))
+
+    # Intenta crear un cliente con telefono invalido.
+    ejecutar_operacion(3, "Registrar cliente con telefono invalido", lambda: Cliente("C003", "Marta Ruiz", "marta@correo.com", "12A"))
+
+    # Crea correctamente el servicio de sala.
+    sala = ejecutar_operacion(4, "Crear servicio de sala valido", lambda: ReservaSala("S001", 50000, 12))
+    # Agrega la sala si fue creada.
+    if sala:
+        sistema.agregar_servicio(sala)
+
+    # Intenta crear un alquiler con tarifa negativa.
+    ejecutar_operacion(5, "Crear equipo con tarifa invalida", lambda: AlquilerEquipo("S002", "Portatil", -1000))
+
+    # Crea correctamente un alquiler de equipo.
+    equipo = ejecutar_operacion(6, "Crear alquiler de equipo valido", lambda: AlquilerEquipo("S003", "Video beam", 80000))
+    # Agrega el equipo si fue creado.
+    if equipo:
+        sistema.agregar_servicio(equipo)
+
+    # Crea correctamente una asesoria avanzada.
+    asesoria = ejecutar_operacion(7, "Crear asesoria valida", lambda: AsesoriaEspecializada("S004", 90000, "avanzada"))
+    # Agrega la asesoria si fue creada.
+    if asesoria:
+        sistema.agregar_servicio(asesoria)
+
+    # Crea una reserva valida de sala.
+    reserva_1 = ejecutar_operacion(8, "Crear reserva valida", lambda: sistema.crear_reserva(cliente_1, sala, 2))
+
+    # Confirma la reserva creada.
+    if reserva_1:
+        ejecutar_operacion(9, "Confirmar reserva", reserva_1.confirmar)
+
+    # Procesa la reserva con impuesto y descuento opcionales.
+    if reserva_1:
+        ejecutar_operacion(10, "Procesar con IVA 19% y descuento 10%", lambda: reserva_1.procesar(impuesto=19, descuento=10))
+
+    # Intenta cancelar una reserva ya procesada.
+    if reserva_1:
+        ejecutar_operacion(11, "Cancelar reserva procesada", reserva_1.cancelar)
+
+    # Deshabilita el alquiler para probar disponibilidad.
+    if equipo:
+        equipo.cambiar_disponibilidad(False)
+        ejecutar_operacion(12, "Reservar servicio no disponible", lambda: sistema.crear_reserva(cliente_1, equipo, 1))
+
+    # Intenta reservar con duracion negativa.
+    if asesoria:
+        ejecutar_operacion(13, "Reservar con duracion invalida", lambda: sistema.crear_reserva(cliente_1, asesoria, -2))
+
+    # Crea y cancela correctamente otra reserva.
+    reserva_2 = ejecutar_operacion(14, "Crear reserva de asesoria", lambda: sistema.crear_reserva(cliente_1, asesoria, 3))
+    # Cancela la reserva pendiente para demostrar el flujo alternativo.
+    if reserva_2:
+        ejecutar_operacion(15, "Cancelar reserva pendiente", reserva_2.cancelar)
+
+    # Muestra el resumen final de objetos almacenados.
+    print("\nRESUMEN FINAL")
+    # Muestra el total de clientes validos.
+    print(f"Clientes almacenados: {len(sistema.clientes)}")
+    # Muestra el total de servicios validos.
+    print(f"Servicios almacenados: {len(sistema.servicios)}")
+    # Muestra el total de reservas creadas correctamente.
+    print(f"Reservas almacenadas: {len(sistema.reservas)}")
+    # Informa la ubicacion relativa del archivo de log.
+    print("Eventos y errores registrados en: software_fj.log")
+    # Registra la terminacion normal del programa.
+    LOGGER.info("Fin de la demostracion secuencial")
