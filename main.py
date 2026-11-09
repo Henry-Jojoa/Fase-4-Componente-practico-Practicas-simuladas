@@ -409,3 +409,52 @@ class Reserva(Entidad):
     def describir(self) -> str:
         # Devuelve un resumen legible.
         return f"{self.identificador}: {self.cliente.nombre} - {self.servicio.nombre} - {self.estado}"
+
+
+# Administra listas internas sin utilizar una base de datos.
+class SistemaGestion:
+    """Contenedor en memoria para clientes, servicios y reservas."""
+
+    # Inicializa las listas internas del sistema.
+    def __init__(self) -> None:
+        # Crea la lista de clientes.
+        self.clientes: list[Cliente] = []
+        # Crea la lista de servicios.
+        self.servicios: list[Servicio] = []
+        # Crea la lista de reservas.
+        self.reservas: list[Reserva] = []
+
+    # Registra un cliente evitando identificadores repetidos.
+    def agregar_cliente(self, cliente: Cliente) -> None:
+        # Busca previamente el identificador en la lista.
+        if any(item.identificador == cliente.identificador for item in self.clientes):
+            # Rechaza el duplicado.
+            raise DatoInvalidoError("Ya existe un cliente con ese identificador.")
+        # Agrega el objeto valido a la lista.
+        self.clientes.append(cliente)
+
+    # Registra un servicio evitando identificadores repetidos.
+    def agregar_servicio(self, servicio: Servicio) -> None:
+        # Busca previamente el identificador en la lista.
+        if any(item.identificador == servicio.identificador for item in self.servicios):
+            # Rechaza el duplicado.
+            raise DatoInvalidoError("Ya existe un servicio con ese identificador.")
+        # Agrega el objeto valido a la lista.
+        self.servicios.append(servicio)
+
+    # Crea y almacena una nueva reserva.
+    def crear_reserva(self, cliente: Cliente, servicio: Servicio, duracion: float) -> Reserva:
+        # Construye la reserva con sus validaciones.
+        reserva = Reserva(cliente, servicio, duracion)
+        # Guarda la reserva en memoria.
+        self.reservas.append(reserva)
+        # Devuelve el objeto para operaciones posteriores.
+        return reserva
+
+    # Define una representacion legible del estado general del sistema.
+    def __str__(self) -> str:
+        # Resume las cantidades almacenadas en las listas internas.
+        return (
+            f"SistemaGestion(clientes={len(self.clientes)}, "
+            f"servicios={len(self.servicios)}, reservas={len(self.reservas)})"
+        )
