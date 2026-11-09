@@ -330,3 +330,82 @@ def aplicar_ajustes(subtotal: float, impuesto: float = 0.0, descuento: float = 0
     total = subtotal * (1 - descuento / 100) * (1 + impuesto / 100)
     # Devuelve el total redondeado a dos decimales.
     return round(total, 2)
+
+
+# Integra un cliente, un servicio, una duracion y un estado.
+class Reserva(Entidad):
+    """Reserva con confirmacion, procesamiento y cancelacion controlados."""
+
+    # Crea un contador compartido para identificadores consecutivos.
+    _consecutivo = count(1)
+
+    # Construye una reserva en estado pendiente.
+    def __init__(self, cliente: Cliente, servicio: Servicio, duracion: float) -> None:
+        # Genera e inicializa el identificador heredado.
+        super().__init__(f"R-{next(self._consecutivo):04d}")
+        # Verifica que el cliente sea del tipo esperado.
+        if not isinstance(cliente, Cliente):
+            # Rechaza objetos que no representen clientes.
+            raise DatoInvalidoError("La reserva requiere un cliente valido.")
+        # Verifica que el servicio derive de Servicio.
+        if not isinstance(servicio, Servicio):
+            # Rechaza objetos que no representen servicios.
+            raise DatoInvalidoError("La reserva requiere un servicio valido.")
+        # Valida disponibilidad y duracion antes de guardar la reserva.
+        servicio.validar_parametros(duracion)
+        # Guarda el cliente asociado.
+        self.cliente = cliente
+        # Guarda el servicio asociado.
+        self.servicio = servicio
+        # Guarda la duracion como decimal.
+        self.duracion = float(duracion)
+        # Inicializa el estado de la reserva.
+        self.estado = "PENDIENTE"
+        # Registra la fecha y hora de creacion.
+        self.fecha_creacion = datetime.now()
+        # Registra el evento correcto.
+        LOGGER.info("Reserva %s creada para %s", self.identificador, cliente.identificador)
+
+    # Confirma una reserva pendiente.
+    def confirmar(self) -> None:
+        # Impide confirmar una reserva que ya cambio de estado.
+        if self.estado != "PENDIENTE":
+            # Informa la operacion no permitida.
+            raise OperacionNoPermitidaError("Solo se pueden confirmar reservas pendientes.")
+        # Revalida el servicio antes de confirmar.
+        self.servicio.validar_parametros(self.duracion)
+        # Actualiza el estado.
+        self.estado = "CONFIRMADA"
+        # Registra la confirmacion.
+        LOGGER.info("Reserva %s confirmada", self.identificador)
+
+    # Procesa una reserva confirmada y calcula su costo.
+    def procesar(self, impuesto: float = 0.0, descuento: float = 0.0) -> float:
+        # Exige confirmacion previa.
+        if self.estado != "CONFIRMADA":
+            # Rechaza el procesamiento fuera de secuencia.
+            raise OperacionNoPermitidaError("Solo se procesan reservas confirmadas.")
+        # Calcula el costo mediante polimorfismo.
+        total = self.servicio.calcular_costo(self.duracion, impuesto, descuento)
+        # Cambia el estado luego de un calculo exitoso.
+        self.estado = "PROCESADA"
+        # Registra el total procesado.
+        LOGGER.info("Reserva %s procesada por %.2f", self.identificador, total)
+        # Entrega el total calculado.
+        return total
+
+    # Cancela una reserva que aun no haya sido procesada.
+    def cancelar(self) -> None:
+        # Impide cancelar reservas finalizadas.
+        if self.estado in {"PROCESADA", "CANCELADA"}:
+            # Informa el estado incompatible.
+            raise OperacionNoPermitidaError("No es posible cancelar una reserva finalizada.")
+        # Actualiza el estado.
+        self.estado = "CANCELADA"
+        # Registra la cancelacion.
+        LOGGER.info("Reserva %s cancelada", self.identificador)
+
+    # Describe la reserva con sus relaciones principales.
+    def describir(self) -> str:
+        # Devuelve un resumen legible.
+        return f"{self.identificador}: {self.cliente.nombre} - {self.servicio.nombre} - {self.estado}"
