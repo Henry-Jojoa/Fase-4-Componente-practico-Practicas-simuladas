@@ -239,3 +239,37 @@ class ReservaSala(Servicio):
     def describir(self) -> str:
         # Devuelve la descripcion polimorfica.
         return f"Sala para {self.capacidad} personas a ${self.tarifa_hora:,.0f} por hora"
+
+
+# Implementa el servicio especializado de alquiler de equipos.
+class AlquilerEquipo(Servicio):
+    """Servicio de alquiler de equipos cobrado por dia."""
+
+    # Construye el servicio de alquiler.
+    def __init__(self, identificador: str, equipo: str, tarifa_dia: float, disponible: bool = True) -> None:
+        # Inicializa los datos comunes.
+        super().__init__(identificador, "Alquiler de equipo", disponible)
+        # Valida que el equipo tenga nombre.
+        if not isinstance(equipo, str) or not equipo.strip():
+            # Rechaza un nombre vacio.
+            raise DatoInvalidoError("El nombre del equipo es obligatorio.")
+        # Valida que la tarifa sea positiva.
+        if tarifa_dia <= 0:
+            # Rechaza una tarifa invalida.
+            raise DatoInvalidoError("La tarifa diaria debe ser mayor que cero.")
+        # Guarda el nombre del equipo.
+        self.equipo = equipo.strip()
+        # Guarda la tarifa diaria.
+        self.tarifa_dia = float(tarifa_dia)
+
+    # Calcula el costo del alquiler con ajustes opcionales.
+    def calcular_costo(self, duracion: float, impuesto: float = 0.0, descuento: float = 0.0) -> float:
+        # Valida la solicitud.
+        self.validar_parametros(duracion)
+        # Calcula y ajusta el valor base.
+        return aplicar_ajustes(self.tarifa_dia * duracion, impuesto, descuento)
+
+    # Describe el equipo y su tarifa.
+    def describir(self) -> str:
+        # Devuelve la descripcion especializada.
+        return f"Alquiler de {self.equipo} a ${self.tarifa_dia:,.0f} por dia"
