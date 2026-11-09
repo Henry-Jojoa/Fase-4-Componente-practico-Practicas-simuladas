@@ -25,3 +25,23 @@ logging.basicConfig(
 )
 # Crea el objeto que se utilizara para escribir eventos y errores.
 LOGGER = logging.getLogger("SoftwareFJ")
+
+
+# Define la excepcion base para los errores controlados del sistema.
+class ErrorSoftwareFJ(Exception):
+    """Excepcion base del sistema Software FJ."""
+
+
+# Define una excepcion para datos que no cumplen las validaciones.
+class DatoInvalidoError(ErrorSoftwareFJ):
+    """Se lanza cuando un dato de entrada es invalido."""
+
+
+# Define una excepcion para servicios que no pueden reservarse.
+class ServicioNoDisponibleError(ErrorSoftwareFJ):
+    """Se lanza cuando un servicio no esta disponible."""
+
+
+# Define una excepcion para cambios de estado no permitidos.
+class OperacionNoPermitidaError(ErrorSoftwareFJ):
+    """Se lanza cuando una operacion no es valida para el estado actual."""
