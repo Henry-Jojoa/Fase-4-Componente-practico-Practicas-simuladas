@@ -458,3 +458,47 @@ class SistemaGestion:
             f"SistemaGestion(clientes={len(self.clientes)}, "
             f"servicios={len(self.servicios)}, reservas={len(self.reservas)})"
         )
+
+
+# Ejecuta una operacion y evita que un error detenga la demostracion.
+def ejecutar_operacion(numero: int, titulo: str, funcion) -> object | None:
+    # Muestra el encabezado de la operacion actual.
+    print(f"\nOperacion {numero}: {titulo}")
+    # Inicia el bloque de manejo de errores.
+    try:
+        # Ejecuta la funcion recibida y guarda su resultado.
+        resultado = funcion()
+    # Captura primero las excepciones controladas del proyecto.
+    except ErrorSoftwareFJ as error:
+        # Registra el error con su traza para auditoria.
+        LOGGER.exception("Operacion %s controlada con error: %s", numero, error)
+        # Informa el error sin cerrar la aplicacion.
+        print(f"ERROR CONTROLADO: {error}")
+        # Indica que no hubo resultado valido.
+        return None
+    # Captura cualquier error inesperado como proteccion adicional.
+    except Exception as error:
+        # Crea y encadena una excepcion del dominio.
+        try:
+            # Lanza un error profesional conservando la causa original.
+            raise ErrorSoftwareFJ("Ocurrio un error inesperado en la operacion.") from error
+        # Captura el error encadenado para registrarlo.
+        except ErrorSoftwareFJ as error_encadenado:
+            # Registra la cadena completa de excepciones.
+            LOGGER.exception("Operacion %s con error inesperado", numero)
+            # Informa el error controlado al usuario.
+            print(f"ERROR INESPERADO CONTROLADO: {error_encadenado}")
+            # Indica que no hubo resultado valido.
+            return None
+    # Se ejecuta solamente cuando no ocurrio ninguna excepcion.
+    else:
+        # Registra el exito de la operacion.
+        LOGGER.info("Operacion %s finalizada correctamente", numero)
+        # Muestra el resultado si tiene contenido.
+        print("RESULTADO:", resultado if resultado is not None else "Operacion exitosa")
+        # Devuelve el resultado exitoso.
+        return resultado
+    # Se ejecuta tanto con exito como con error.
+    finally:
+        # Muestra que el sistema continua disponible.
+        print("Estado: operacion finalizada; el sistema continua activo.")
