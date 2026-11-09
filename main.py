@@ -205,3 +205,37 @@ class Servicio(Entidad, ABC):
     def calcular_costo(self, duracion: float, impuesto: float = 0.0, descuento: float = 0.0) -> float:
         # No calcula costos en la clase abstracta.
         raise NotImplementedError
+
+
+# Implementa el servicio especializado de reserva de salas.
+class ReservaSala(Servicio):
+    """Servicio de sala cobrado por hora y capacidad."""
+
+    # Construye una sala con tarifa y capacidad.
+    def __init__(self, identificador: str, tarifa_hora: float, capacidad: int, disponible: bool = True) -> None:
+        # Inicializa los datos comunes del servicio.
+        super().__init__(identificador, "Reserva de sala", disponible)
+        # Valida una tarifa positiva.
+        if tarifa_hora <= 0:
+            # Rechaza una tarifa inconsistente.
+            raise DatoInvalidoError("La tarifa de la sala debe ser mayor que cero.")
+        # Valida una capacidad entera positiva.
+        if not isinstance(capacidad, int) or isinstance(capacidad, bool) or capacidad <= 0:
+            # Rechaza una capacidad inconsistente.
+            raise DatoInvalidoError("La capacidad debe ser un entero mayor que cero.")
+        # Guarda la tarifa por hora.
+        self.tarifa_hora = float(tarifa_hora)
+        # Guarda la capacidad maxima.
+        self.capacidad = capacidad
+
+    # Calcula el costo con parametros opcionales equivalentes a sobrecarga en Python.
+    def calcular_costo(self, duracion: float, impuesto: float = 0.0, descuento: float = 0.0) -> float:
+        # Valida disponibilidad y duracion.
+        self.validar_parametros(duracion)
+        # Delega la formula comun a una funcion segura.
+        return aplicar_ajustes(self.tarifa_hora * duracion, impuesto, descuento)
+
+    # Describe las caracteristicas particulares de la sala.
+    def describir(self) -> str:
+        # Devuelve la descripcion polimorfica.
+        return f"Sala para {self.capacidad} personas a ${self.tarifa_hora:,.0f} por hora"
