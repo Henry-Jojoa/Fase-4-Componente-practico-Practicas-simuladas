@@ -588,3 +588,8 @@ def demostracion() -> None:
     print("Eventos y errores registrados en: software_fj.log")
     # Registra la terminacion normal del programa.
     LOGGER.info("Fin de la demostracion secuencial")
+
+
+if __name__ == "__main__":
+    # Inicia la demostracion completa del sistema.
+    demostracion()
