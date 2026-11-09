@@ -23,3 +23,5 @@ logging.basicConfig(
     format="%(asctime)s | %(levelname)s | %(message)s",
     encoding="utf-8",
 )
+# Crea el objeto que se utilizara para escribir eventos y errores.
+LOGGER = logging.getLogger("SoftwareFJ")
