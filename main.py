@@ -273,3 +273,44 @@ class AlquilerEquipo(Servicio):
     def describir(self) -> str:
         # Devuelve la descripcion especializada.
         return f"Alquiler de {self.equipo} a ${self.tarifa_dia:,.0f} por dia"
+
+
+# Implementa el servicio especializado de asesoria.
+class AsesoriaEspecializada(Servicio):
+    """Servicio de asesoria cobrado por hora y nivel."""
+
+    # Define factores permitidos para cada nivel de asesoria.
+    FACTORES = {"basica": 1.0, "intermedia": 1.25, "avanzada": 1.5}
+
+    # Construye una asesoria con tarifa y nivel.
+    def __init__(self, identificador: str, tarifa_hora: float, nivel: str, disponible: bool = True) -> None:
+        # Inicializa los datos comunes.
+        super().__init__(identificador, "Asesoria especializada", disponible)
+        # Normaliza el nivel recibido.
+        nivel_normalizado = str(nivel).strip().lower()
+        # Verifica que el nivel figure en el catalogo permitido.
+        if nivel_normalizado not in self.FACTORES:
+            # Informa los niveles aceptados.
+            raise DatoInvalidoError("El nivel debe ser basica, intermedia o avanzada.")
+        # Valida una tarifa positiva.
+        if tarifa_hora <= 0:
+            # Rechaza una tarifa inconsistente.
+            raise DatoInvalidoError("La tarifa de asesoria debe ser mayor que cero.")
+        # Guarda la tarifa por hora.
+        self.tarifa_hora = float(tarifa_hora)
+        # Guarda el nivel validado.
+        self.nivel = nivel_normalizado
+
+    # Calcula el costo segun tarifa, duracion y nivel.
+    def calcular_costo(self, duracion: float, impuesto: float = 0.0, descuento: float = 0.0) -> float:
+        # Valida la solicitud.
+        self.validar_parametros(duracion)
+        # Calcula el subtotal segun el factor del nivel.
+        subtotal = self.tarifa_hora * duracion * self.FACTORES[self.nivel]
+        # Aplica impuesto y descuento opcionales.
+        return aplicar_ajustes(subtotal, impuesto, descuento)
+
+    # Describe el nivel y la tarifa de la asesoria.
+    def describir(self) -> str:
+        # Devuelve la descripcion especializada.
+        return f"Asesoria {self.nivel} a ${self.tarifa_hora:,.0f} por hora base"
