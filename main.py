@@ -4,7 +4,7 @@ print("Profesora: Yerly Zolandy Parra Villarreal")
 
 # Nombre del estudiante: Jhon Henry Jojoa
 # Grupo: 446
-
+# Programa: Ingeniería de Sistemas
 
 """Sistema integral de clientes, servicios y reservas para Software FJ.
 
