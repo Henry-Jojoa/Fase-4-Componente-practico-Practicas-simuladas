@@ -1,6 +1,9 @@
 print("Bienvenidos al curso de Programación")
 print("Universidad Nacional Abierta y a Distancia")
 print("Profesora: Yerly Zolandy Parra Villarreal")
+
+# Nombre del estudiante: Jhon Henry Jojoa
+
 """Sistema integral de clientes, servicios y reservas para Software FJ.
 
 El programa demuestra abstraccion, herencia, polimorfismo, encapsulacion,
